@@ -35,3 +35,39 @@ Top contributing words:
 ```
 
 A positive score means the word pushes the model towards the positive class; a negative score pushes it towards the negative class. You can customise the training data in the script by editing the `positive_texts` and `negative_texts` lists.
+
+## Additional Transparent Models
+
+In addition to the explainable text classifier, this repository includes several other transparent models:
+
+- `transparent_language_model.py` – Implements a simple bigram language model. It trains on a small corpus and predicts the next word based on word bigram counts. The `explain_next_word` function prints the probability distribution over possible next words, so you can see exactly how the model chooses its output.
+
+- `decision_tree_classifier.py` – Trains a decision tree classifier on the Iris dataset. The script prints the decision rules and feature importances, providing a transparent view of how the model makes decisions.
+
+- `linear_regression_example.py` – Demonstrates a linear regression model on synthetic data. It prints the learned coefficients and intercept, and shows how each feature weight contributes to a sample prediction.
+
+### Running the Additional Scripts
+
+To run each of these scripts, use the following commands:
+
+```bash
+python transparent_language_model.py
+```
+
+The bigram language model will train on its built‑in sample text and then prompt you for a prefix. It outputs the probability of each candidate next word and selects the most probable one.
+
+```bash
+python decision_tree_classifier.py
+```
+
+This script fits a decision tree on the Iris dataset, prints the tree structure and feature importances, and then performs a sample prediction.
+
+```bash
+python linear_regression_example.py
+```
+
+The linear regression script trains on synthetic data, prints the learned coefficients, and calculates the contribution of each feature to a sample prediction.
+
+## About Transparent AI
+
+Transparent AI, also known as explainable AI (XAI), is essential for building trust, ensuring accountability, and meeting regulatory requirements. By using interpretable models like logistic and linear regression, decision trees, and simple language models, we can provide clear explanations of how predictions are made. Understanding which features drive outcomes helps users detect bias, improve fairness, and confidently adopt AI technology.
