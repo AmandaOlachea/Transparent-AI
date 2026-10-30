@@ -70,8 +70,9 @@ def explain_prediction(text: str):
     predicted_label = model.predict(X_test)[0]
 
     # Determine which row of coefficients to use based on predicted class
-    class_index = list(model.classes_).index(predicted_label)
-    coeffs = model.coef_[class_index]
+    # Binary logistic regression stores one coefficient row for the positive class.
+    # Reverse the sign to explain predictions of the negative class.
+    coeffs = model.coef_[0] if predicted_label == model.classes_[1] else -model.coef_[0]
     feature_names = vectorizer.get_feature_names_out()
     counts = X_test.toarray()[0]
 
