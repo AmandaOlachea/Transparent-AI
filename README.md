@@ -39,6 +39,34 @@ python transparent_language_model.py
 
 It shows the probabilities of possible next words based on word pairs in its training corpus.
 
+## Interactive explanation interface
+
+The repository includes a local browser interface that shows **three levels of explanation from the same real model output**:
+
+- **Explain like I'm 5:** plain-language explanation based on the actual supporting word features.
+- **Everyday:** what evidence influenced the prediction, plus its limitations.
+- **Technical:** fitted feature weights, word counts, signed contributions, intercept, decision score, reconstructed score, reconstruction error, estimated class probabilities, and complete JSON evidence.
+
+Start the interface after installing dependencies:
+
+```bash
+python app.py
+```
+
+Open **http://127.0.0.1:8765** in your browser. Type any sentence and choose an explanation level. The app runs locally and binds only to the loopback interface.
+
+The three views share a single prediction record. The plain-language explanation is derived from actual contributing features rather than a canned explanation for each class. The technical view lets you verify that the word contributions and intercept reconstruct the classifier's decision score.
+
+This interface currently explains the repository's **binary sentiment classifier**. The other model examples remain available as separate scripts; they are not yet wired into the interface. It is not a general-purpose conversational LLM.
+
+To run automated checks, including the explanation-engine tests:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+**Privacy:** the local server is intended for demonstrations with synthetic or nonsensitive text. It does not provide authentication or production security controls.
+
 ## The models
 
 | File | What you can inspect |
