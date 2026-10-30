@@ -1,112 +1,80 @@
-# Transparent-AI
+# Transparent AI: Understanding Why a Model Makes a Prediction
 
-This repository contains a simple example of an explainable text classification model built with Python and scikit‑learn. The aim is to demonstrate how to build a lightweight language model that not only makes predictions but also explains why it predicted a particular label.
+AI can produce an answer that looks convincing while giving us very little insight into how it got there. I wanted to explore what happens when we can actually inspect the calculations, features, or examples behind a prediction.
 
-## Project Structure
+This repository is a collection of small, runnable explainable AI examples. Some models are inherently easier to inspect, while others need attribution methods that only give us part of the picture. I think that distinction matters, especially when AI is being considered for decisions that affect people.
 
-- `explainable_language_model.py` – Python script that trains a logistic regression classifier on a small set of positive and negative sentences and exposes an `explain_prediction` function. Logistic regression models assign a weight (coefficient) to each feature, which makes them highly interpretable. The script uses these coefficients to report the contribution of each word in the input sentence to the final decision.
+## Run it yourself
 
-## Requirements
-
-The script requires Python 3 and scikit‑learn. You can install scikit‑learn via pip:
+You'll need Python 3.10 or newer. From the repository folder:
 
 ```bash
-pip install scikit-learn
+python -m venv .venv
 ```
 
-## Running the Script
+Activate the environment:
 
-To run the model interactively:
+- macOS/Linux: `source .venv/bin/activate`
+- Windows PowerShell: `.venv\Scripts\Activate.ps1`
+
+Then install dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Run an example:
 
 ```bash
 python explainable_language_model.py
 ```
 
-The script will train the model on its sample data and then prompt you to enter sentences. For each sentence, it prints the predicted label (either “positive” or “negative”) and a list of words with their contribution scores.
+Enter a sentence to see the predicted sentiment and which known words contributed to that prediction.
 
-Example usage:
-
-```
-> I am very happy with this product
-Predicted label: positive
-Top contributing words:
-  happy: 0.80
-  product: 0.40
-```
-
-A positive score means the word pushes the model towards the positive class; a negative score pushes it towards the negative class. You can customise the training data in the script by editing the `positive_texts` and `negative_texts` lists.
-
-## Additional Transparent Models
-
-In addition to the explainable text classifier, this repository includes several other transparent models:
-
-- `transparent_language_model.py` – Implements a simple bigram language model. It trains on a small corpus and predicts the next word based on word bigram counts. The `explain_next_word` function prints the probability distribution over possible next words, so you can see exactly how the model chooses its output.
-
-- `decision_tree_classifier.py` – Trains a decision tree classifier on the Iris dataset. The script prints the decision rules and feature importances, providing a transparent view of how the model makes decisions.
-
-- `linear_regression_example.py` – Demonstrates a linear regression model on synthetic data. It prints the learned coefficients and intercept, and shows how each feature weight contributes to a sample prediction.
-
-### Running the Additional Scripts
-
-To run each of these scripts, use the following commands:
+Or try the count-based language model:
 
 ```bash
 python transparent_language_model.py
 ```
 
-The bigram language model will train on its built‑in sample text and then prompt you for a prefix. It outputs the probability of each candidate next word and selects the most probable one.
+It shows the probabilities of possible next words based on word pairs in its training corpus.
+
+## The models
+
+| File | What you can inspect |
+| --- | --- |
+| `explainable_language_model.py` | Word contributions to a binary logistic regression decision |
+| `transparent_language_model.py` | Bigram counts and next-word probabilities |
+| `decision_tree_classifier.py` | Decision rules and feature importance |
+| `linear_regression_example.py` | Coefficients and prediction components |
+| `random_forest_classifier.py` | Feature importance and approximate contributions |
+| `knn_classifier.py` | Nearest training examples and distances |
+| `svm_classifier.py` | Linear weights and support vectors |
+| `simple_neural_network.py` | Approximate integrated-gradient attributions |
+
+Run any example with `python filename.py`.
+
+## Check the explanations
+
+I added tests because a model producing an explanation doesn't mean that explanation is correct.
 
 ```bash
-python decision_tree_classifier.py
+python -m unittest discover -s tests -v
 ```
 
-This script fits a decision tree on the Iris dataset, prints the tree structure and feature importances, and then performs a sample prediction.
+The tests check both predicted classes of the sentiment model, verify that its feature contributions reconstruct its decision score, and check bigram probabilities against the observed counts. GitHub Actions runs the same tests on pushes and pull requests.
 
-```bash
-pyt
+See [what these explanations mean](docs/what-the-explanations-mean.md) for limitations and how I'd evaluate them.
 
-hon linear_regression_example.py
-```
+## The black box problem
 
-The linear regression script trains on synthetic data, prints the learned coefficients, and calculates the contribution of each feature to a sample prediction.
+A small logistic regression model lets us reconstruct its decision score from coefficients. A bigram model lets us see exactly how the next-word probabilities were counted. Those are useful forms of transparency.
 
-## About Transparent AI
+A neural network is more complicated. Integrated gradients and other attribution methods can highlight influential inputs, but they do not reveal every internal mechanism or prove that a model's stated explanation is faithful.
 
-Transparent AI, also known as explainable AI (XAI), is essential for building trust, ensuring accountability, and meeting regulatory requirements. By using interpretable models like logistic and linear regression, decision trees, and simple language models, we can provide clear explanations of how predictions are made. Understanding which features drive outcomes helps users detect bias, improve fairness, and confidently adopt AI technology.
+The goal here is to make model behavior more inspectable, test the explanations, and document what the methods can and cannot show. I want other people to be able to run the same examples and challenge the results.
 
+## References
 
-### Additional Models Continued
-
-- `random_forest_classifier.py` – Builds a random forest classifier on the Iris dataset and reports global feature importances. The script also approximates per‑feature contributions for a sample prediction by averaging the paths through the trees.
-- `knn_classifier.py` – Trains a k‑nearest neighbors classifier and, for a test sample, prints the distances, indices and labels of the closest training points so you can see why a particular label was chosen.
-- `svm_classifier.py` – Fits a support‑vector machine with a linear kernel and prints the coefficients for each class as well as the support vectors that define the decision boundary. It also shows how each feature weight contributes to a single prediction.
-- `simple_neural_network.py` – Trains a small neural network on the Iris dataset using scikit‑learn’s MLPClassifier and explains its predictions using integrated gradients. Integrated gradients compute an attribution score for each feature by integrating the gradient of the output with respect to the input along a path from a baseline to the actual input.
-
-#### Running These Scripts
-
-To run these additional scripts:
-
-```bash
-python random_forest_classifier.py
-```
-This script outputs overall feature importances and approximate per‑feature contributions for a sample prediction.
-
-```bash
-python knn_classifier.py
-```
-The program prints the distances and labels of the three nearest neighbors for the first sample, illustrating how the prediction is determined.
-
-```bash
-python svm_classifier.py
-```
-It displays the weight vector for each class, the number of support vectors and the per‑feature contributions for a sample prediction.
-
-```bash
-python simple_neural_network.py
-```
-This runs the neural network example, prints the predicted class for the first sample and lists the integrated‑gradient attribution values for each input feature.
-
-### Transparency in Complex Models
-
-The AI landscape also includes powerful models like large language models, diffusion models, and other foundation models. These are typically deep neural networks with millions or billions of parameters and thus operate as black boxes. While it isn’t feasible to fully trace every parameter’s influence, researchers use techniques such as attention visualization, saliency maps, integrated gradients and feature‑importance analysis to provide partial explanations of why a model made a particular decision. Even so, the field of explainable AI acknowledges that as models grow in scale and complexity, achieving complete transparency is challenging. These interpretability tools provide insight but cannot match the direct interpretability of simpler models like linear regression or decision trees.
-
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
+- [NIST Four Principles of Explainable AI](https://www.nist.gov/publications/four-principles-explainable-artificial-intelligence)
